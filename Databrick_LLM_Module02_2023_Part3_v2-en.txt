@@ -1,0 +1,58 @@
+In this section, we'll talk about one of the most popular techniques today in PEFT,
+which is LoRA. LoRA is our re-parameterization method, which means it leverages low-rank
+representation to minimize the number of trainable parameters. We'll cover a small amount of linear
+algebra to dissect what low-rank representations mean. In fine-tuning or any general model training
+scenario, we update the model weights as we go through forward and also backward pass.
+The idea behind LoRA is that we can decompose the weight_delta matrix into two low-rank matrices.
+What difference does it make, you may wonder? Before we can answer that question,
+let's now briefly revisit linear algebra basics to understand what matrix rank is.
+Rank refers to the maximum number of linearly independent columns in a matrix.
+When you have a full-rank matrix, it means that the matrix doesn't have any redundant
+rows or columns that can be expressed based on other combinations of columns.
+So take a look at an example of below over here. Since column 2 and column 3 can be obtained by
+multiplying column 1 with a constant, they are not linear and they are not independent. Therefore,
+the column rank is one. The same applies to the second row as well:
+because we can get a second row by multiplying the first row by three. So essentially,
+we're trying to make sure that we represent information in a matrix without any redundancy.
+So how does weight matrix decomposition work? The observation that inspires LoRA
+is that the rank of the attention weight matrix change is lower than the actual Weight_delta
+matrix. So when we do any fine-tuning, we can freeze the pre-trained weights
+and only update the two lower rank weight matrices as demonstrated by W_a and also W_b over here.
+But how does this reduce the number of trainable parameters? Let's take a look at a dummy example.
+W_delta has dimension of 100 x 100. We can decompose that to two smaller matrices, W_a with
+100 x 2 dimension and W_b with a dimension of 2 x 100. When we multiply these two matrices together,
+they still give us the same shape as (100x100) which is the same shape as W_delta. And this
+is really important because we can now then concatenate the results of these matrices with the
+original pre-trained weights and pass that to the subsequent layer. And this decomposition method
+dramatically reduces the number of parameters.
+So the total number of parameters that we see over here is (100x2) + (2x100), which is 400.
+But if I were to get the number of parameters from this original W_delta matrix, then we have 10,000
+parameters altogether. So this brings us to a 96% of reduction in number of trainable parameters.
+Researchers found that LoRA matches the performance of fine-tuning and sometimes even
+outperforms fine-tuning with just 0.02 percent of the original parameters of GPT-3 over here.
+The next natural question to ask is how do we determine the rank of these matrices?
+We can treat that as a hyperparameter to search over. Generally, rank sizes
+produce roughly similar validation accuracies, at least for GPT-3. Intuitively speaking though,
+small r likely won't work for all tasks or data sets because in cases where the downstream tasks
+are much more different than the original tasks that the base model is trained on.
+But the researchers have also played with updating different combinations of weight
+matrices for decomposition but there were no clear trends to take away from.
+In a nutshell, LoRA, just like prompt tuning, locks up or freezes the majority
+of the model weights. You can share or reuse the same foundation model. You can improve
+training efficiency since you don't have to compute most gradients or optimizer states.
+It also adds no additional serving latency because we can merge W_a and also W_b literally.
+We can also combine it with other PEFT methods as well. However, the existing PEFT library
+from Hugging Face doesn't allow a combination of PEFT methods to be concurrently used yet.
+In the lab notebook that we'll be exploring later,
+you will be asked to apply LoRA as a fine-tuning technique.
+Now let's talk about some of the limitations of LoRA.
+Even though we could theoretically just swap different weight update matrices at serving time,
+it is not really straightforward on how to do so using when we have a single mixed task batch.
+If we want to dynamically choose which combos of weight matrices A and B at serving time,
+then there's additional serving latency. But there are also, of course, other open
+research questions as well, such as, why do we only decompose W_delta? Can we decompose other
+matrices like the original weight matrix or can we reduce the number of parameters even more?
+And in fact, there is already a newer PEFT technique called IA3
+that improves upon LoRA that can reduce even more number of trainable parameters.
+In the next section, we'll do a general walkthrough of
+PEFT limitations that apply to most PEFT methods out there.

@@ -1,0 +1,39 @@
+Welcome back! Our second module is about efficient fine-tuning. So fine-tuning if you're not familiar
+with it, it's the process of taking a pre-trained uh you know deep model uh and uh passing a new
+data and updating its weights with sort of the smaller amount of new data that you're fine-tuning
+it on. And it's a very powerful uh tool that you can do with many of of these foundation models,
+basically base models that have been pre-trained on a lot of data to acquire good feature
+representations that you can then use to get a model that's um you know really high quality for
+your application uh your data set and so on uh. So with language models it's especially powerful
+because getting a good base language model can be really expensive so everyone pre-trains these
+models on on large amounts of data and many domains you know lots of data from the web
+you end up with a model that understands language well, has general knowledge about different things
+in the world, you know, understands different types of maybe reasoning or conversation that
+are happening uh in this data set, but it's not really tailored to any specific domain. So with
+fine tuning, you can then take that model and either give it sort of new information that it
+didn't have before like, say something about data inside your company that's a trade secret that
+you know you don't put on the Internet, or even tailor it to do a specific task like classifying
+sentiments or translating or you know extracting structured information or something like that.
+So it's one of the main things that you'll you'll be doing um you know as as an ML engineer working
+with language models and we're going to talk about fine tuning in general, you know, what's
+um you know what's required to get it to work well and how does it work and we're also going to be
+talking about some exciting um you know recent techniques on parameter-efficient fine-tuning,
+which allow you to do fine tuning at very little cost, by basically you know not updating
+necessarily all the parameters in a model you know at the same time or to the same amount. So these
+are really great because first of all, they're very inexpensive to try um and second, even if
+you are going to do more expensive fine-tuning later they give you a good way to throw in some
+data and see, you know, whether there is even potential to fine-tune model on it to get it
+to do better at a specific task. So fine-tuning today is really um you know the main way that uh
+people are getting high quality models in many domains. If you want the highest quality model
+you probably want to fine-tune. There are lots of domains where, for example, just fine-tuning
+um even small inexpensive models like Llama that have very few parameters leads to better results
+than something like GPT-4 or GPT-3.5 out of the box mostly because they have a chance to absorb
+a bunch of knowledge. So for example, at UC Berkeley there's a a project called Gorilla
+that trains a model to learn how to use different software tools and API command line tools you know
+different different apis that that developers commonly use like kubernetes and they found that
+you know with a small amount of fine-tuning, you can get much higher quality responses and they're
+even on popular apis that the very large language models should know a lot about. So this is just
+one example. You know in most domains if you're running a model you know it's doing okay but
+you wish it would do better, often the main tool you have available or the best tool that's likely
+to you know to get you potentially arbitrarily high in quality is fine-tuning. So we're excited
+to talk to you today about that and some of the tools you can use to get started with it quickly.
